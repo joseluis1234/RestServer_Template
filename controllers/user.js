@@ -4,47 +4,62 @@ const bcrypt = require("bcryptjs");
 const Usuario = require("../models/usuario");
 const usuario = {};
 
-usuario.get = (req, res) => {
-  const { q, nombre, apikey } = req.query;
+usuario.get = async (req, res) => {
+
+  const {limite = 5, desde=0} = req.query;
+  const query = {estado:true};
+
+  const [total,usuarios] = await Promise.all([
+    Usuario.countDocuments(query),
+    Usuario.find(query)
+      .skip(desde)
+      .limit(limite),
+  ])
   res.json({
-    msg: "Get API - controlador",
-    q,
-    nombre,
-    apikey,
+    total,
+    usuarios
   });
 };
 
-usuario.put = (req, res) => {
-  const id = req.params.id;
+usuario.put = async (req, res) => {
+  const {id} = req.params;
+  const {_id, password, google,correo, ...resto } = req.body;
+
+  if (password) {
+    const salt = bcrypt.genSaltSync(10); //10 es la cantidad de veces que se va a encriptar
+    resto.password = bcrypt.hashSync(password, salt);
+  }
+  const usuarioDB = await Usuario.findByIdAndUpdate(id, resto,{new: true})
+
   res.json({
-    msg: "Put API - controlador",
-    id,
+    usuarioDB,
   });
 };
 
 usuario.post = async (req, res) => {
-
-  const {nombre,correo,password,rol} = req.body;
-  const usuarios = new Usuario({nombre,correo,password,rol});
+  const { nombre, correo, password, rol } = req.body;
+  const usuarios = new Usuario({ nombre, correo, password, rol });
 
   //Hacer el hash de la contraseña
-  const salt = await bcrypt.genSalt(10);//10 es la cantidad de veces que se va a encriptar
+  const salt = bcrypt.genSaltSync(10); //10 es la cantidad de veces que se va a encriptar
   usuarios.password = bcrypt.hashSync(password, salt);
-  
+
   //Guardar en DB
   await usuarios.save();
-  res.json({
-    usuario
-  });
+  res.json(usuarios);
 };
 
-usuario.delete = (req, res) => {
-  res.json({
-    msg: "Delete API - controlador",
-  });
+usuario.delete = async(req, res) => {
+    const {id} = req.params;
+   //Borrar Usuario Fisicamente
+  //  const usuarioDel = await Usuario.findByIdAndDelete(id);
+  const usuarioDel = await Usuario.findByIdAndUpdate(id,{estado:false});
+   
+  res.json(usuarioDel);
 };
 
 usuario.patch = (req, res) => {
+  
   res.json({
     msg: "Patch API - controlador",
   });
