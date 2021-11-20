@@ -12,8 +12,8 @@ usuario.get = async (req, res) => {
   const [total,usuarios] = await Promise.all([
     Usuario.countDocuments(query),
     Usuario.find(query)
-      .skip(desde)
-      .limit(limite),
+    .skip(Number(desde))
+    .limit(Number(limite))
   ])
   res.json({
     total,
@@ -54,17 +54,9 @@ usuario.delete = async(req, res) => {
    //Borrar Usuario Fisicamente
   //  const usuarioDel = await Usuario.findByIdAndDelete(id);
   const usuarioDel = await Usuario.findByIdAndUpdate(id,{estado:false});
-  // const usuarioAutenticado = req.usuario;
    
   res.json(usuarioDel);
 };
 
-
-usuario.patch = (req, res) => {
-  
-  res.json({
-    msg: "Patch API - controlador",
-  });
-};
 
 module.exports = usuario;

@@ -1,5 +1,4 @@
-const Role = require("../models/role");
-const Usuario = require("../models/usuario");
+const {Usuario,Role,Categoria,Producto} = require("../models");
 
 //Verifica que el rol exista en la BD
 const rolValido = async (rol = "") => {
@@ -25,5 +24,20 @@ const idExistente = async (id = "") => {
   }
 };
 
+//Verifica que el id pertenezca a alguna categoria
+const existeCategoria = async (id ='') =>{
+  const existeIdCat = await Categoria.findById( id );
+  if(!existeIdCat){
+    throw new Error(`El ${id} no tiene una categoria asociada`);
+  }
+}
 
-module.exports = { rolValido, emailExistente, idExistente };
+//Verificar que el id pertenezca a algun producto
+const existeProducto = async (id ='') =>{
+  const existeIdPro = await Producto.findById( id );
+  if(!existeIdPro){
+    throw new Error(`El ${id} no tiene un producto asociado`);
+  }
+}
+
+module.exports = { rolValido, emailExistente, idExistente, existeCategoria, existeProducto };

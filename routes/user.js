@@ -37,6 +37,5 @@ router.delete("/:id",[
     validarCampos
 ],usuario.delete);
 
-router.patch("/", usuario.patch);
 
 module.exports = router;

@@ -40,7 +40,6 @@ const validaJWT = async(req = request,res = response,next)=>{
             msg:'Token no valido'
         });
     }
-    next();
 }
 
 
